@@ -10,16 +10,16 @@ void gpio_select(const unsigned pin, const gpio_function_t mode) {
     
     // Calculate the GPFSEL register that contains the configuration for
     // the pin.
-    volatile unsigned int* gpfsel = GPFSEL0 + index * 4;
-
+    volatile unsigned int* gpfsel = GPFSEL0 + index ;
+    
     // Read the register.
     //const uint32_t value = mem_read32(gpfsel);
     r = *gpfsel;
-
+    
     // Set the desired function for the pin.
     const unsigned int masked = r & ~(7 << shift);
     const unsigned int fsel = masked | mode << shift;
-
+    
     // Write the value back to the register.
     //mem_write32(gpfsel, fsel);
     *gpfsel = fsel;
@@ -30,14 +30,16 @@ void gpio_set(const unsigned pin, const int high) {
     unsigned int index = pin >> 5;
     // The bit in the registers to set or clear the pin.
     unsigned int bit = (1) << (pin & 31);
+    volatile unsigned int* GPSEThigh = GPSET0 + index;
+    volatile unsigned int* GPSETlow = GPCLR0 + index;
     if (high) {
         // Write the bit to GPSEL to set the pin high.
         //mem_write32(GPSET0 + index * 4, bit);
-        *((volatile unsigned int*)(GPSET0 + index)) = bit;
+        *GPSEThigh = bit;
     }
     else {
         // Write the bit to GPCLR to set the pin low.
         //mem_write32(BASE_ADDR + GPCLR0 + index * 4, bit);
-        *((volatile unsigned int*)(GPCLR0 + index)) = bit;
+        *GPSETlow = bit;
     }
 }
